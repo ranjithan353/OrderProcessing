@@ -1,3 +1,6 @@
+using System;
+using System.Net;
+using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
 using OrderProcessingSystem.Models;
 
@@ -47,10 +50,10 @@ public class OrderProcessingService : IOrderProcessingService
                 orderId,
                 new PartitionKey(orderId));
 
-            if (order.Resource.Status == "Created")
+            if (order.Resource.Status == OrderStatus.Created)
             {
                 // Update order status to Processed
-                order.Resource.Status = "Processed";
+                order.Resource.Status = OrderStatus.Processed;
                 order.Resource.ProcessedAt = DateTime.UtcNow;
 
                 await _container.ReplaceItemAsync(

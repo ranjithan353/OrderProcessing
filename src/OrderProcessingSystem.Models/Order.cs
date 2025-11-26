@@ -1,4 +1,17 @@
+using System;
+using System.Collections.Generic;
+
 namespace OrderProcessingSystem.Models;
+
+public enum OrderStatus
+{
+    Created = 0,
+    Processing = 1,
+    Processed = 2,
+    Shipped = 3,
+    Delivered = 4,
+    Cancelled = 5
+}
 
 public class Order
 {
@@ -7,7 +20,7 @@ public class Order
     public string CustomerEmail { get; set; } = string.Empty;
     public List<OrderItem> Items { get; set; } = new();
     public decimal TotalAmount { get; set; }
-    public string Status { get; set; } = "Created";
+    public OrderStatus Status { get; set; } = OrderStatus.Created;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? ProcessedAt { get; set; }
     public string ShippingAddress { get; set; } = string.Empty;

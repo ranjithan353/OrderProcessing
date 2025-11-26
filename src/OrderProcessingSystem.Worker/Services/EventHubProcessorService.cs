@@ -1,9 +1,14 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using Azure.Messaging.EventHubs;
 using Azure.Messaging.EventHubs.Consumer;
 using Azure.Messaging.EventHubs.Processor;
 using Azure.Storage.Blobs;
-using System.Text;
-using System.Text.Json;
+using Microsoft.Extensions.Hosting;
 using OrderProcessingSystem.Models;
 
 namespace OrderProcessingSystem.Worker.Services;
@@ -119,7 +124,7 @@ public class EventHubProcessorService : BackgroundService
                 // Process each event
                 foreach (var eventGridEvent in events)
                 {
-                    if (eventGridEvent != null && eventGridEvent.EventType == "Order.Created")
+                    if (eventGridEvent != null && eventGridEvent.EventType == Constants.EventTypes.OrderCreated)
                     {
                         // Extract order data from the event
                         OrderCreatedEvent? orderData = null;
