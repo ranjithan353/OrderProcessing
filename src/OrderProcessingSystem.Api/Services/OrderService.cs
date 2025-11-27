@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using OrderProcessingSystem.Api.Repositories;
-using OrderProcessingSystem.Models;
+using OrderProcessingSystem.Api.Models;
 
 namespace OrderProcessingSystem.Api.Services;
 

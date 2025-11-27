@@ -1,6 +1,6 @@
 using System;
 
-namespace OrderProcessingSystem.Models;
+namespace OrderProcessingSystem.Api.Models;
 
 /// <summary>
 /// Event published when an order is created

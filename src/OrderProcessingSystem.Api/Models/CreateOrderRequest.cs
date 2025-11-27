@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace OrderProcessingSystem.Models;
+namespace OrderProcessingSystem.Api.Models;
 
 public class CreateOrderRequest
 {

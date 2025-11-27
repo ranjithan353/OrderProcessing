@@ -1,6 +1,6 @@
 using System;
 
-namespace OrderProcessingSystem.Models;
+namespace OrderProcessingSystem.Api.Models;
 
 /// <summary>
 /// Custom exception for order not found scenarios
@@ -51,5 +51,4 @@ public class BusinessRuleException : Exception
     {
     }
 }
-
 

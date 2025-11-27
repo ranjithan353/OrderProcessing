@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using OrderProcessingSystem.Models;
+using OrderProcessingSystem.Api.Models;
 
 namespace OrderProcessingSystem.Api.Repositories;
 

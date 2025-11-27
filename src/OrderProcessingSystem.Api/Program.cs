@@ -1,25 +1,80 @@
 using System;
+using System.Text;
 using System.Threading.Tasks;
 using Azure.Messaging.EventGrid;
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using OrderProcessingSystem.Api.Mappings;
 using OrderProcessingSystem.Api.Repositories;
 using OrderProcessingSystem.Api.Services;
 using OrderProcessingSystem.Api.Validators;
-using OrderProcessingSystem.Models;
+using OrderProcessingSystem.Api.Models;
+using Serilog;
+
+// Configure Serilog early
+var config = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+    .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables()
+    .Build();
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(config)
+    .Enrich.FromLogContext()
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Use Serilog for logging
+builder.Host.UseSerilog();
 
 // Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+// Configure Swagger with JWT support
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Order Processing System API",
+        Version = "v1",
+        Description = "API for managing orders with JWT authentication"
+    });
+
+    // Add JWT authentication to Swagger
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token in the text input below.",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 // Add AutoMapper
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
@@ -95,6 +150,40 @@ builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 // Register Order Service
 builder.Services.AddScoped<IOrderService, OrderService>();
 
+// Configure JWT Authentication
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+var secretKey = jwtSettings["SecretKey"] ?? "YourSuperSecretKeyThatShouldBeAtLeast32CharactersLong!";
+var issuer = jwtSettings["Issuer"] ?? "OrderProcessingSystem";
+var audience = jwtSettings["Audience"] ?? "OrderProcessingSystemUsers";
+var expirationMinutes = int.Parse(jwtSettings["ExpirationMinutes"] ?? "60");
+
+var key = Encoding.UTF8.GetBytes(secretKey);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = issuer,
+        ValidAudience = audience,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
+builder.Services.AddAuthorization();
+
+// Register Authentication Service
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
@@ -108,6 +197,7 @@ app.UseSwaggerUI(c =>
 
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
@@ -116,16 +206,26 @@ var cosmosService = app.Services.GetRequiredService<ICosmosDbService>();
 await cosmosService.InitializeAsync();
 
 // Display startup information
-var loggerFactory = app.Services.GetRequiredService<ILoggerFactory>();
-var logger = loggerFactory.CreateLogger("Startup");
-logger.LogInformation("");
-logger.LogInformation("========================================");
-logger.LogInformation("Order Processing System API Started");
-logger.LogInformation("========================================");
-logger.LogInformation("Swagger UI: http://localhost:5000/swagger");
-logger.LogInformation("API Base URL: http://localhost:5000/api/orders");
-logger.LogInformation("========================================");
-logger.LogInformation("");
+Log.Information("");
+Log.Information("========================================");
+Log.Information("Order Processing System API Started");
+Log.Information("========================================");
+Log.Information("Swagger UI: http://localhost:5000/swagger");
+Log.Information("API Base URL: http://localhost:5000/api/orders");
+Log.Information("Authentication Endpoint: http://localhost:5000/api/auth/login");
+Log.Information("========================================");
+Log.Information("");
 
-app.Run();
+try
+{
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
 

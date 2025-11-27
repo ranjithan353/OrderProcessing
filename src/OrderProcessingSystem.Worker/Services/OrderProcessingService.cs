@@ -2,7 +2,7 @@ using System;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
-using OrderProcessingSystem.Models;
+using OrderProcessingSystem.Api.Models;
 
 namespace OrderProcessingSystem.Worker.Services;
 

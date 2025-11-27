@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using OrderProcessingSystem.Models;
+using OrderProcessingSystem.Api.Models;
 
 namespace OrderProcessingSystem.Api.Services;
 

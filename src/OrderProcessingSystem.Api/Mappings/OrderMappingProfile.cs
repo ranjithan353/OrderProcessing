@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using AutoMapper;
-using OrderProcessingSystem.Models;
+using OrderProcessingSystem.Api.Models;
 
 namespace OrderProcessingSystem.Api.Mappings;
 

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Logging;
 using OrderProcessingSystem.Api.Services;
-using OrderProcessingSystem.Models;
+using OrderProcessingSystem.Api.Models;
 using Polly;
 
 namespace OrderProcessingSystem.Api.Repositories;

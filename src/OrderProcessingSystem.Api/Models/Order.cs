@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace OrderProcessingSystem.Models;
+namespace OrderProcessingSystem.Api.Models;
 
 public enum OrderStatus
 {

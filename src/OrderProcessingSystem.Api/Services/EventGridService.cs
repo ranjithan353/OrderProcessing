@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Azure;
 using Azure.Messaging.EventGrid;
 using Microsoft.Extensions.Logging;
-using OrderProcessingSystem.Models;
+using OrderProcessingSystem.Api.Models;
 using Polly;
 
 namespace OrderProcessingSystem.Api.Services;

@@ -3,18 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrderProcessingSystem.Api.Services;
 using OrderProcessingSystem.Api.Validators;
-using OrderProcessingSystem.Models;
+using OrderProcessingSystem.Api.Models;
 
 namespace OrderProcessingSystem.Api.Controllers;
 
-/// <summary>
-/// Controller for order management operations
+/// <summary>/// Controller for order management operati
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class OrdersController : ControllerBase
 {
     private readonly IOrderService _orderService;
@@ -74,7 +75,7 @@ public class OrdersController : ControllerBase
 
             return CreatedAtAction(nameof(GetOrder), new { id = order.Id }, order);
         }
-        catch (Models.ValidationException ex)
+        catch (OrderProcessingSystem.Api.Models.ValidationException ex)
         {
             _logger.LogWarning(ex, "Validation error in CreateOrder");
             return BadRequest(new { error = ex.Message });

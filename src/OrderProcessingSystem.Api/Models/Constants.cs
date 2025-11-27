@@ -1,4 +1,4 @@
-namespace OrderProcessingSystem.Models;
+namespace OrderProcessingSystem.Api.Models;
 
 /// <summary>
 /// Constants used throughout the application
@@ -40,5 +40,4 @@ public static class Constants
         public const string UnitPriceInvalid = "Item {0} must have a unit price greater than 0";
     }
 }
-
 
